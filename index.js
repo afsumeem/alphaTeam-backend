@@ -33,18 +33,19 @@ async function run() {
       const cursor = usersCollection.find({});
       const user = await cursor.toArray();
       res.send(user);
-      console.log(user);
+      // console.log(user);
     });
-
-    //get single users
 
     //GET API- filtered users
     app.get("/filteredUsers", async (req, res) => {
-      const { search, domain, gender, availability } = req.query;
+      const { search, gender, domain, available } = req.query;
 
       const filter = {};
       if (search) {
-        filter.$or = [{ name: { $regex: search, $options: "i" } }];
+        filter.$or = [
+          { first_name: { $regex: search, $options: "i" } },
+          { last_name: { $regex: search, $options: "i" } },
+        ];
       }
       if (domain) {
         filter.domain = domain;
@@ -52,8 +53,8 @@ async function run() {
       if (gender) {
         filter.gender = gender;
       }
-      if (availability) {
-        filter.availability = availability;
+      if (available !== undefined) {
+        filter.available = available === "true";
       }
 
       const users = await usersCollection.find(filter).toArray();
