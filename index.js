@@ -27,6 +27,20 @@ async function run() {
     //database collections
     const usersCollection = database.collection("users");
 
+    //Single user
+
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await usersCollection.findOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+
+    //POST API-
+    app.post("/users", async (req, res) => {
+      const user = await usersCollection.insertOne(req.body);
+      res.json(user);
+    });
+
     //get all users
 
     app.get("/users", async (req, res) => {
@@ -59,20 +73,6 @@ async function run() {
 
       const users = await usersCollection.find(filter).toArray();
       res.send(users);
-    });
-
-    //Single user
-
-    app.get("/users/:id", async (req, res) => {
-      const id = req.params.id;
-      const result = await usersCollection.findOne({ _id: ObjectId(id) });
-      res.send(result);
-    });
-
-    //POST API-
-    app.post("/users", async (req, res) => {
-      const user = await usersCollection.insertOne(req.body);
-      res.json(user);
     });
 
     //update user
