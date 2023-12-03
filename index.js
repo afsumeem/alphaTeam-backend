@@ -61,9 +61,51 @@ async function run() {
       res.send(users);
     });
 
+    //Single user
+
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await usersCollection.findOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+
     //POST API-
+    app.post("/users", async (req, res) => {
+      const user = await usersCollection.insertOne(req.body);
+      res.json(user);
+    });
+
+    //update user
+    app.put("/users/:id", async (req, res) => {
+      const userId = req.params.id;
+      const updatedUserData = req.body;
+
+      try {
+        const updateUser = await usersCollection.updateOne(
+          { _id: ObjectId(userId) },
+          { $set: updatedUserData }
+        );
+
+        if (updateUser.modifiedCount > 0) {
+          res.json({ message: "User updated successfully" });
+        } else {
+          res.status(404).json({ error: "User not found" });
+        }
+      } catch (error) {
+        // console.error("Error updating user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
 
     //Delete API -
+    app.delete("/users/:id", async (req, res) => {
+      const deletedUser = await usersCollection.deleteOne({
+        _id: ObjectId(req.params.id),
+      });
+      res.json(deletedUser);
+    });
+
+    //
   } finally {
     //await client.close();
   }
